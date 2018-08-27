@@ -16,6 +16,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def state
   {:timer-state (atom :stopped)
+   :down-ts     (atom 0)
    :start-ts    (atom 0)
    :stop-ts     (atom 0)
    :timer-str   (atom "00:00:00.000")
@@ -23,28 +24,46 @@
 
 (defn deref-state [] (zipmap (keys state) (map deref (vals state))))
 
-(let [{:keys [timer-state start-ts stop-ts timer-str times]} state]
+(let [{:keys [timer-state down-ts start-ts stop-ts timer-str times]} state]
   (defn tick! []
     (when (= @timer-state :started)
       (reset! stop-ts (reagent-helloworld.util/nanoTime))))
   
-  (let [tick-handle (atom nil)]
-    (defn btn-click! []
+  (let [tick-handle  (atom nil)
+        reset-handle (atom nil)]
+    (defn click! [event]
+      (js/console.log (str @timer-state " " event))
       (let [ts (reagent-helloworld.util/nanoTime)]
-        (case @timer-state
-          :stopped
-          (do
-            (reset! start-ts ts)
-            (reset! stop-ts  ts)
-            (reset! timer-state :started)
-            (reset! tick-handle (js/setInterval tick! 7)))
+        (case [@timer-state event]
+          [:stopped :mouse-down]
+          (do (reset! down-ts ts)
+              (reset! timer-state :pending)
+              (when @reset-handle
+                (js/clearTimeout @reset-handle)
+                (reset! reset-handle nil))
+              (->> (js/setTimeout
+                     #(when (= @timer-state :pending)
+                        (doseq [a [down-ts start-ts stop-ts]] (reset! a 0))) 1000)
+                   (reset! reset-handle)))
           
-          :started
+          [:stopped :mouse-up] nil
+          
+          [:pending :mouse-up]
+          (if (> @down-ts 0)
+            (do (reset! timer-state :stopped))
+            (do (reset! start-ts ts)
+                (reset! stop-ts  ts)
+                (reset! timer-state :started)
+                (reset! tick-handle (js/setInterval tick! 7))))
+          
+          [:started :mouse-down]
           (do (reset! timer-state :stopped)
               (reset! stop-ts ts)
               (swap!  times conj (- ts @start-ts))
               (js/clearInterval @tick-handle)
-              (reset! tick-handle nil))))))
+              (reset! tick-handle nil))
+          
+          [:started :mouse-up] nil))))
   
   (add-watch start-ts :start-ts-watch (fn [k r o n] (reset! stop-ts n)))
   (add-watch stop-ts  :stop-ts-watch
@@ -58,15 +77,19 @@
 
 
 (comment
-  (deref-state)
-  
-  (btn-click!))
+  (deref-state))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn home-page []
-  [:div
-   [:input {:type "button" :value @(:timer-str state) :on-click btn-click!
-            :style {:padding 10 :font-size "4em" :margin-top 30}}]])
+(let [{:keys [timer-state down-ts start-ts timer-str]} state
+      padding "60px"]
+  (defn home-page []
+    [:div {:on-mouse-down #(click! :mouse-down)
+           :on-mouse-up   #(click! :mouse-up)
+           :style {:text-align "center" :class "test" :border "1px solid #8DF" :user-select "none";
+                   :padding-top padding :padding-bottom padding :margin padding
+                   :color (cond (= @timer-state :pending) (if (= @down-ts 0) "green" "red") :else "black")}}
+     [:h1 @timer-str]]))
+
 
 (defn mount-root []
   (reagent/render [home-page] (.getElementById js/document "app")))
