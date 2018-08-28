@@ -53,7 +53,8 @@
               :pretty-print  false}}
             :app
             {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
-             :figwheel {:on-jsload "reagent-helloworld.core/mount-root"}
+             :figwheel {:on-jsload "reagent-helloworld.core/mount-root"
+                        :websocket-host :js-client-host}
              :compiler
              {:main "reagent-helloworld.dev"
               :asset-path "/js/out"
