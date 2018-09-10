@@ -1,6 +1,7 @@
 *
 !*/
 !*.clj*
+!*.sh
 !*.md
 target/
 !.gitignore
