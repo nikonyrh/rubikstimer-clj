@@ -1,5 +1,5 @@
-(ns reagent-helloworld.server
-    (:require [reagent-helloworld.handler :refer [app]]
+(ns rubikstimer-clj.server
+    (:require [rubikstimer-clj.handler :refer [app]]
               [config.core :refer [env]]
               [ring.adapter.jetty :refer [run-jetty]])
     (:gen-class))

@@ -1,4 +1,4 @@
-(defproject reagent-helloworld "0.1.0-SNAPSHOT"
+(defproject rubikstimer-clj "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -24,12 +24,12 @@
             [lein-asset-minifier "0.2.7"
              :exclusions [org.clojure/clojure]]]
 
-  :ring {:handler reagent-helloworld.handler/app
-         :uberwar-name "reagent-helloworld.war"}
+  :ring {:handler rubikstimer-clj.handler/app
+         :uberwar-name "rubikstimer-clj.war"}
 
   :min-lein-version "2.5.0"
-  :uberjar-name "reagent-helloworld.jar"
-  :main reagent-helloworld.server
+  :uberjar-name "rubikstimer-clj.jar"
+  :main rubikstimer-clj.server
   :clean-targets ^{:protect false}
   [:target-path
    [:cljsbuild :builds :app :compiler :output-dir]
@@ -53,10 +53,10 @@
               :pretty-print  false}}
             :app
             {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
-             :figwheel {:on-jsload "reagent-helloworld.core/mount-root"
+             :figwheel {:on-jsload "rubikstimer-clj.core/mount-root"
                         :websocket-host :js-client-host}
              :compiler
-             {:main "reagent-helloworld.dev"
+             {:main "rubikstimer-clj.dev"
               :asset-path "/js/out"
               :output-to "target/cljsbuild/public/js/app.js"
               :output-dir "target/cljsbuild/public/js/out"
@@ -76,11 +76,11 @@
    :nrepl-middleware [cider.piggieback/wrap-cljs-repl]
                       
    :css-dirs ["resources/public/css"]
-   :ring-handler reagent-helloworld.handler/app}
+   :ring-handler rubikstimer-clj.handler/app}
 
 
 
-  :profiles {:dev {:repl-options {:init-ns reagent-helloworld.repl}
+  :profiles {:dev {:repl-options {:init-ns rubikstimer-clj.repl}
                    :dependencies [[cider/piggieback "0.3.8"]
                                   [binaryage/devtools "0.9.10"]
                                   [ring/ring-mock "0.3.2"]

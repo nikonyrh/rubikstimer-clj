@@ -1,8 +1,8 @@
-(ns reagent-helloworld.handler
+(ns rubikstimer-clj.handler
   (:require [compojure.core :refer [GET defroutes]]
             [compojure.route :refer [not-found resources]]
             [hiccup.page :refer [include-js include-css html5]]
-            [reagent-helloworld.middleware :refer [wrap-middleware]]
+            [rubikstimer-clj.middleware :refer [wrap-middleware]]
             [config.core :refer [env]]))
 
 (def mount-target

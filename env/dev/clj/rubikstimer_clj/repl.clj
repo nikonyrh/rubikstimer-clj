@@ -1,5 +1,5 @@
-(ns reagent-helloworld.repl
-  (:use reagent-helloworld.handler
+(ns rubikstimer-clj.repl
+  (:use rubikstimer-clj.handler
         figwheel-sidecar.repl-api
         ring.server.standalone
         [ring.middleware file-info file]))

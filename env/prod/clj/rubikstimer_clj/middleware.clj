@@ -1,4 +1,4 @@
-(ns reagent-helloworld.middleware
+(ns rubikstimer-clj.middleware
   (:require [ring.middleware.defaults :refer [site-defaults wrap-defaults]]))
 
 (defn wrap-middleware [handler]

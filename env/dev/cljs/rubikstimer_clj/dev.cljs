@@ -1,6 +1,6 @@
-(ns ^:figwheel-no-load reagent-helloworld.dev
+(ns ^:figwheel-no-load rubikstimer-clj.dev
   (:require
-    [reagent-helloworld.core :as core]
+    [rubikstimer-clj.core :as core]
     [devtools.core :as devtools]))
 
 (devtools/install!)

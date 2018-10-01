@@ -1,4 +1,4 @@
-(ns reagent-helloworld.util)
+(ns rubikstimer-clj.util)
 
 (defn nanoTime []
   #?(:clj  (System/nanoTime)

@@ -1,17 +1,17 @@
-(ns reagent-helloworld.core
-    (:require [reagent-helloworld.util]
+(ns rubikstimer-clj.core
+    (:require [rubikstimer-clj.util]
               
               [reagent.core :as reagent :refer [atom]]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]))
 
 ; lein clean && lein figwheel
-; (ns reagent-helloworld.core)
+; (ns rubikstimer-clj.core)
 
 ; SKIP_BUILD=1 ./build.sh
 
 (comment
-  (require '(reagent-helloworld.util)))
+  (require '(rubikstimer-clj.util)))
 
 (defn to-fixed "Add leading zeros to an integer" [len i]
   (let [i (str i)]
@@ -67,7 +67,7 @@
       {:keys [times result-avgs]} result-states]
   (defn tick! []
     (when (= @timer-state :started)
-      (reset! stop-ts (reagent-helloworld.util/nanoTime))))
+      (reset! stop-ts (rubikstimer-clj.util/nanoTime))))
   
   
   (defn reset-result-avgs!
@@ -100,7 +100,7 @@
         reset-handle (atom nil)]
     (defn click! [event]
     ; (js/console.log (str @timer-state " " event))
-      (let [ts (reagent-helloworld.util/nanoTime)]
+      (let [ts (rubikstimer-clj.util/nanoTime)]
         (case [@timer-state event]
           [:stopped :up]   nil ; Mouse up when we stop the clock
           [:pending :down] nil ; Holding down a spacebar
