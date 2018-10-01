@@ -1,7 +1,9 @@
 #!/bin/bash -e
 #time lein uberjar && time ~/bin/s3cp.sh target/reagent-helloworld.jar
 
-lein clean && lein cljsbuild once min && lein minify-assets
+if [ "$SKIP_BUILD" = "" ]; then
+  lein clean && lein cljsbuild once min && lein minify-assets
+fi
 
 mkdir -p release
 
@@ -14,7 +16,7 @@ cat > release/index.html << EOF
 </body></html>
 EOF
 
-cp target/cljsbuild/public/js/app.js* resources/public/css/site.min.css release
+cp target/cljsbuild/public/js/app.js* resources/public/css/site.min.css src/cljs/reagent_helloworld/core.cljs release
 
 D=nikonyrh-public/misc/rubiktimer-cljs
 echo "https://s3-eu-west-1.amazonaws.com/$D/index.html"
