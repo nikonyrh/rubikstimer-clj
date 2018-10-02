@@ -35,11 +35,12 @@
    :start-ts    (atom 0)
    :stop-ts     (atom 0)})
 
+
 (defonce result-states
   {:times       (atom
-                  (case :sample
-                    :empty  []
-                    :sample (vec (for [_ (range 15)] (-> (Math/random) (* 5) (+ 20) (* 1e9) long)))))
+                  (case :empty
+                    :empty  ()
+                    :sample (for [_ (range 15)] (-> (Math/random) (* 5) (+ 20) (* 1e9) long))))
    :result-avgs (atom (sorted-map -1 nil 5 nil 12 nil))})
 
 (defn deref-states []
@@ -48,14 +49,14 @@
        (apply merge)))
 
 (defn avg-of-n [n results]
-  (let [n-tot (count results)]
-    (when (>= n-tot n)
+  (let [first-n (take n results)]
+    (when (-> first-n count (= n))
       (if (= n 1)
-        (nth results (dec n-tot))
-        (->> (subvec results (- n-tot n) n-tot) sort rest butlast (apply +) double (* (/ (- n 2))))))))
+        (first first-n)
+        (->> first-n sort rest butlast (apply +) double (* (/ (- n 2))))))))
 
 (comment
-  (let [data [-10 2 30 4 5]]
+  (let [data (reverse [-10 2 30 4 5])]
     (for [i [1 3 5 10 12]]
       [i (avg-of-n i data)])))
 
@@ -140,7 +141,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (let [{:keys [timer-state down-ts start-ts stop-ts]} timer-states
       {:keys [times result-avgs]} result-states
-
+      
       spacebar?     #(= (.-which %) 32)
       make-event-fn #(fn[e] (when (% e) (click! %2)))
       on-mouse-down  (make-event-fn identity  :down)
@@ -152,9 +153,11 @@
     (let [time-ns (- @stop-ts @start-ts)]
       [:div
        [:div {:id "app-sidebar"}
-        [:ul (for [[ix t] (map list (range) @times)]
-               ^{:key (str "sidebar-li-" ix)}
-               [:li (ns-to-str t)])]]
+        [:ul (for [[ix t] (reverse (map list (range) @times))]  ; reverse, what a hack...
+               (let [clr (condp > ix 5 "A80" 12 "800" "AAA")]   ; indicate which are the most recent 5 & 12 runs
+                 ^{:key (str "sidebar-li-" ix "-" clr)}
+                 [:li {:style {:color (str "#" clr)}}
+                  (ns-to-str t)]))]]
        
        [:div {:tab-index 0 :id "app-timer"
               :on-mouse-down  on-mouse-down :on-mouse-up  on-mouse-up
