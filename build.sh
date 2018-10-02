@@ -16,7 +16,7 @@ cat > release/index.html << EOF
 </body></html>
 EOF
 
-cp target/cljsbuild/public/js/app.js* resources/public/css/site.min.css src/cljs/reagent_helloworld/core.cljs release
+cp target/cljsbuild/public/js/app.js* resources/public/css/site.min.css src/cljs/rubikstimer_clj/core.cljs release
 
 D=nikonyrh-public/misc/rubiktimer-cljs
 echo "https://s3-eu-west-1.amazonaws.com/$D/index.html"
