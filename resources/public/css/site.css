@@ -1,0 +1,160 @@
+.body-container {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.125em;
+  color: #333;
+  line-height: 1.5em;
+  height: 100%;
+  
+  /* https://developers.google.com/web/updates/2013/12/300ms-tap-delay-gone-away */
+  touch-action: manipulation;
+}
+
+/******************************************************************************/
+#app-timer {
+  user-select: none;
+  outline: 0px solid black;
+}
+
+#app-timer h1 {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: 95vh;
+  text-align: center;
+  line-height: 80vh;
+  
+  /* border: 0.3em solid #DEF; */
+  
+  text-shadow: 0 0 1em #FA8;
+  font-size: 7em;
+  margin: 0px;
+}
+
+#app-timer h2 {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, 100%);
+  width: 75%;
+  text-align: center;
+  
+  color: #AAA;
+  font-size: 1.4em;
+}
+
+@media screen and (orientation:portrait) and (max-device-width:1900px) {
+  #app-timer h1 {
+    text-align: right;
+    transform: translate(-55%, -45%);
+    text-shadow: 0 0 0.6em #FB9;
+    font-size: 4.5em;
+  }
+  
+  #app-timer h2 {
+    font-size: 1.0em;
+    transform: translate(-40%, 25%);
+  }
+}
+
+@media screen and (orientation:landscape) and (max-device-width:1900px) {
+  #app-timer h1 {
+    transform: translate(-50%, -50%);
+    font-size: 5em;
+  }
+  
+  #app-timer h2 {
+    font-size: 0.9em;
+    transform: translate(-50%, 60%);
+  }
+}
+
+/******************************************************************************/
+#app-sidebar {
+  position: absolute;
+  left: 0px; top: 0px;
+  background-color: white;
+  font-weight: bold;
+  height: 90vh;
+  
+  /* border: 0.2em solid #FED; */
+  
+  display: flex;
+  flex-direction: column-reverse;
+  user-select: none;
+  overflow: hidden;
+}
+
+#app-sidebar ul {
+	list-style: none;
+	padding: 0.5em;
+	margin: 0px;
+}
+
+
+#app-bottombar span {
+  position: fixed;
+  left: 1%; bottom: 1px;
+  width: 96%;
+  padding: 0.2em;
+  
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+#app-bottombar-1 {
+  text-align: left;
+}
+
+#app-bottombar-5 {
+  text-align: center;
+}
+
+#app-bottombar-12 {
+  text-align: right;
+}
+
+@media screen and (orientation:portrait) and (max-device-width:1900px) {
+  #app-sidebar {
+    height: 95hv;
+  }
+  
+  #app-bottombar span {
+    font-size: 1.2em;
+  }
+  
+  #app-bottombar-1 {
+    text-align: right;
+    margin-bottom: 3em;
+  }
+  
+  #app-bottombar-5 {
+    text-align: right;
+    margin-bottom: 1.5em;
+  }
+
+  #app-bottombar-12 {
+    text-align: right;
+  }
+}
+
+@media screen and (orientation:landscape) and (max-device-width:1900px) {
+  #app-sidebar ul {
+    font-size: 0.8em;
+	padding: 0.5em;
+  }
+  
+  #app-bottombar span {
+    font-size: 1.2em;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: #09f;
+}
+
+a:hover {
+  text-decoration: underline;
+}
