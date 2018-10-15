@@ -72,17 +72,19 @@
   
   
   (defn reset-result-avgs!
-    ([] (some-> @times last reset-result-avgs!))
+    ([] (some-> @times first reset-result-avgs!))
     ([took-ns]
      (let [times  @times
            avgs   @result-avgs
            n-avgs (keys avgs)]
        (->> (zipmap n-avgs
               (for [n n-avgs]
-                (if (= n -1)
+                (case n
+                  -1
                   (if-let [current-best (avgs n)]
                     (min current-best took-ns)
                     took-ns)
+                  
                   (avg-of-n n times))))
             (into (sorted-map))
             (reset! result-avgs)))))
@@ -154,7 +156,7 @@
       [:div
        [:div {:id "app-sidebar"}
         [:ul (for [[ix t] (reverse (map list (range) @times))]  ; reverse, what a hack...
-               (let [clr (condp > ix 5 "A80" 12 "800" "AAA")]   ; indicate which are the most recent 5 & 12 runs
+               (let [clr (condp > ix 5 "800" 12 "A80" "AAA")]   ; indicate which are the most recent 5 & 12 runs
                  ^{:key (str "sidebar-li-" ix "-" clr)}
                  [:li {:style {:color (str "#" clr)}}
                   (ns-to-str t)]))]]
