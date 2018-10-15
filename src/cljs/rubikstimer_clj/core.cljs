@@ -28,12 +28,27 @@
                    (map to-fixed [2 2] [s (quot ms 10)])
                    ["." ""])))))
 
+(let [opposites {:U #{:D :U}, :L #{:L :R}, :F #{:F :B}, :D #{:D :U}, :R #{:L :R}, :B #{:F :B}}
+      sides     (-> opposites keys sort)
+      modifiers ["" "'" "2"]]
+  (defn generate-scramble []
+    (let [side-seq (repeatedly #(rand-nth sides))]
+      (->> (map (fn [this-side prev-side modifier]
+                  (when-not ((opposites this-side) prev-side)
+                    (str (name this-side) modifier)))
+             (rest side-seq) side-seq (repeatedly #(rand-nth modifiers)))
+           (filter some?)))))
+
+
+; (->> (generate-scramble) (take 100))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defonce timer-states
   {:timer-state (atom :stopped)
    :down-ts     (atom 0)
    :start-ts    (atom 0)
-   :stop-ts     (atom 0)})
+   :stop-ts     (atom 0)
+   :scramble    (atom "")})
 
 
 (defonce result-states
@@ -64,8 +79,17 @@
 (def min-took-ns 2e9)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(let [{:keys [timer-state down-ts start-ts stop-ts times]} timer-states
-      {:keys [times result-avgs]} result-states]
+(let [{:keys [timer-state down-ts start-ts stop-ts times scramble]} timer-states
+      {:keys [times result-avgs]} result-states
+      
+      scramble-seq (atom (generate-scramble))
+      scramble-len 25]
+  (defn reset-scramble! []
+    (->> @scramble-seq (take scramble-len) (clojure.string/join " ") (reset! scramble))
+    (swap! scramble-seq (partial drop scramble-len))
+    @scramble)
+  
+  
   (defn tick! []
     (when (= @timer-state :started)
       (reset! stop-ts (rubikstimer-clj.util/nanoTime))))
@@ -121,7 +145,8 @@
           
           [:pending :up]
           (if (> @down-ts 0)
-            (do (reset! timer-state :stopped))
+            (do (reset! timer-state :stopped)
+                (reset-scramble!))
             (do (reset! start-ts ts)
                 (reset! stop-ts  ts)
                 (reset! timer-state :started)
@@ -137,11 +162,12 @@
 (comment
   (deref-states))
 
-(defonce _
-  (reset-result-avgs!))
+(defonce _ ; An init hack :/
+  [(reset-result-avgs!)
+   (reset-scramble!)])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(let [{:keys [timer-state down-ts start-ts stop-ts]} timer-states
+(let [{:keys [timer-state down-ts start-ts stop-ts scramble]} timer-states
       {:keys [times result-avgs]} result-states
       
       spacebar?     #(= (.-which %) 32)
@@ -170,7 +196,8 @@
                                :stopped (if (or (= time-ns 0)
                                                 (> time-ns min-took-ns)) "black" "gray")
                                "lightgray")}}
-        [:h1 (ns-to-str time-ns)]]
+        [:h1 (ns-to-str time-ns)]
+        [:h2 @scramble]]
        
        [:div {:id "app-bottombar"}
         (for [[k v] @result-avgs]
