@@ -28,15 +28,15 @@
                    (map to-fixed [2 2] [s (quot ms 10)])
                    ["." ""])))))
 
+
 (let [opposites {:U #{:D :U}, :L #{:L :R}, :F #{:F :B}, :D #{:D :U}, :R #{:L :R}, :B #{:F :B}}
-      sides     (-> opposites keys sort)
-      modifiers ["" "'" "2"]]
-  (defn generate-scramble []
-    (let [side-seq (repeatedly #(rand-nth sides))]
-      (->> (map (fn [this-side prev-side modifier]
+      filter-fn (fn [this-side prev-side modifier]
                   (when-not ((opposites this-side) prev-side)
-                    (str (name this-side) modifier)))
-             (rest side-seq) side-seq (repeatedly #(rand-nth modifiers)))
+                    (str (name this-side) modifier)))]
+  (defn generate-scramble []
+    (let [side-seq     (repeatedly #(rand-nth [:B :D :F :L :R :U]))
+          modifier-seq (repeatedly #(rand-nth ["" "'" "2"]))]
+      (->> (map filter-fn (rest side-seq) side-seq modifier-seq)
            (filter some?)))))
 
 
@@ -80,14 +80,15 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (let [{:keys [timer-state down-ts start-ts stop-ts times scramble]} timer-states
-      {:keys [times result-avgs]} result-states
-      
-      scramble-seq (atom (generate-scramble))
-      scramble-len 25]
-  (defn reset-scramble! []
-    (->> @scramble-seq (take scramble-len) (clojure.string/join " ") (reset! scramble))
-    (swap! scramble-seq (partial drop scramble-len))
-    @scramble)
+      {:keys [times result-avgs]} result-states]
+  
+  (let [scramble-seq (atom (generate-scramble))
+        scramble-len 25
+        drop-len     (+ scramble-len 10)] ; dropping some extra items to make sequences statistically independent
+    (defn generate-scramble! []
+      (->>  @scramble-seq (take scramble-len) (clojure.string/join " ") (reset! scramble))
+      (swap! scramble-seq (partial drop drop-len))
+      @scramble))
   
   
   (defn tick! []
@@ -127,6 +128,7 @@
         reset-handle (atom nil)]
     (defn click! [event]
     ; (js/console.log (str @timer-state " " event))
+      
       (let [ts (rubikstimer-clj.util/nanoTime)]
         (case [@timer-state event]
           [:stopped :up]   nil ; Mouse up when we stop the clock
@@ -146,7 +148,7 @@
           [:pending :up]
           (if (> @down-ts 0)
             (do (reset! timer-state :stopped)
-                (reset-scramble!))
+                (generate-scramble!))
             (do (reset! start-ts ts)
                 (reset! stop-ts  ts)
                 (reset! timer-state :started)
@@ -164,7 +166,7 @@
 
 (defonce _ ; An init hack :/
   [(reset-result-avgs!)
-   (reset-scramble!)])
+   (generate-scramble!)])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (let [{:keys [timer-state down-ts start-ts stop-ts scramble]} timer-states
