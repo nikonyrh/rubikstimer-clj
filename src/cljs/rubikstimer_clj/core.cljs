@@ -123,6 +123,7 @@
         (swap! times conj took-ns)
         (reset-result-avgs! took-ns))))
   
+; (def log (atom [])) (def t0 (rubikstimer-clj.util/nanoTime))
   
   (let [tick-handle  (atom nil)
         reset-handle (atom nil)]
@@ -130,20 +131,23 @@
     ; (js/console.log (str @timer-state " " event))
       
       (let [ts (rubikstimer-clj.util/nanoTime)]
+      ; (swap! log conj [(-> ts (- t0) (* 1e-6) Math/round (* 1e-3)) ts @down-ts @stop-ts @timer-state event])
+        
         (case [@timer-state event]
           [:stopped :up]   nil ; Mouse up when we stop the clock
           [:pending :down] nil ; Holding down a spacebar
           
           [:stopped :down]
-          (do (reset! down-ts ts)
-              (reset! timer-state :pending)
-              (when @reset-handle
-                (js/clearTimeout @reset-handle)
-                (reset! reset-handle nil))
-              (->> (js/setTimeout
-                     #(when (= @timer-state :pending)
-                        (doseq [a [down-ts start-ts stop-ts]] (reset! a 0))) 333)
-                   (reset! reset-handle)))
+          (when (-> ts (- @stop-ts) (> 0.2e9))
+            (reset! down-ts ts)
+            (reset! timer-state :pending)
+            (when @reset-handle
+              (js/clearTimeout @reset-handle)
+              (reset! reset-handle nil))
+            (->> (js/setTimeout
+                   #(when (= @timer-state :pending)
+                      (doseq [a [down-ts start-ts stop-ts]] (reset! a 0))) 333)
+                 (reset! reset-handle)))
           
           [:pending :up]
           (if (> @down-ts 0)
